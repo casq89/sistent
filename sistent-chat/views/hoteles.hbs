@@ -1,0 +1,35 @@
+{{> create_hotel_modal}}
+<div class="row justify-content-md-center">
+	<a href="#"  data-toggle="modal" data-target="#modal" id="add" onclick="addHotel()" ><span class=" fa fa-plus-circle" data-toggle="tooltip" title="Nuevo Hotel"></span></a>
+</div>
+<div class="row justify-content-md-center">
+	<div class="cards">
+	{{#if data}}
+		{{#each data}}
+			<a href="#" id="{{id}}" data-toggle="modal" data-target="#modal" onclick="setHotel('{{id}}')">
+				<div class="card bg-hotel ml-4 mt-4">
+					<div class="card-header">
+						<div class="row">
+							<div class="col-12">
+								Nombre: {{nombre}}
+								<br>
+								Ciudad: {{ciudad}}
+								<br>
+								WebSite: {{site}}
+							</div>
+						</div>
+					</div>
+			    	<div class="card-body text-center">
+			    		<img src="{{imagen}}" height="300">
+			    	</div>
+			  	</div>
+			  </a>
+		{{/each}}
+	{{else}}
+		<h2>
+			No hay Hoteles disponibles actualmente
+		</h2>
+	{{/if}}
+	</div>
+</div>
+

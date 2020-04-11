@@ -1,0 +1,64 @@
+{{> edit_reserva_modal}}
+<div class="row justify-content-md-center">
+    <div class="col-12 grid-reservas">
+        <table class="table table-striped">
+            <thead class="bg-dark-h">
+                <tr>
+                    <th>Cédula</th>
+                    <th>Nombre Completo</th>
+                    <th>Teléfono</th>
+                    <th>Ciudad destino</th>
+                    <th>Hotel</th>
+                    <th>Nº Habitación</th>
+                    <th>Nº Personas</th>
+                    <th>Fecha Ingreso</th>
+                    <th>Fecha Salida</th>
+                    <th>Estado reserva</th>
+                    <th>Editar</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#if data}}
+                    {{#each data}}
+                        <tr>
+                            <td>{{cedula}}</td>
+                            <td>{{nombre_completo}}</td>
+                            <td>{{telefono}}</td>
+                            <td>{{ciudad}}</td>
+                            <td>{{hotel}}</td>
+                            <td>{{habitacion}}</td>
+                            <td>{{numero_personas}}</td>
+                            <td>{{fecha_ingreso}}</td>
+                            <td>{{fecha_salida}}</td>
+                            <td>
+                                {{estadoString estado}}
+                            </td>
+                            <td>
+                                <a href="#" onclick="setReserva('{{id}}', '{{cedula}}', '{{nombre_completo}}', '{{telefono}}', '{{ciudad}}', '{{hotel}}','{{habitacion}}', '{{numero_personas}}','{{fecha_ingreso}}','{{fecha_salida}}','{{estado}}')" data-toggle="tooltip" title="Editar Reserva" data-toggle="modal" data-target="#modal" id="add" ><span class="fab fa-steam" ></span></a>
+                            </td>
+                        </tr>
+                    {{/each}}
+                {{else}}
+                    <tr>
+                        <td colspan="11">No hay Rervas en el sistema</td>
+                    </tr>
+                {{/if}}            
+            </tbody>
+        </table>
+    </div>
+</div>
+{{#if flag}}
+    <script src="/js/toast.js"></script>
+    <script>
+        var toast = new iqwerty.toast.Toast();
+        toast
+        .setText("{{msg}}")
+        .setDuration(3000)
+        .stylize({
+            background: '#78C363',
+            color: 'white',
+            'box-shadow': '0 0 50px rgba(0, 0, 0, .7)'
+        })
+        .show();
+    </script>
+{{/if}}

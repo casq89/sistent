@@ -1,0 +1,43 @@
+{
+  "name": "sistent_chat",
+  "version": "1.0.0",
+  "description": "Chat para reservas hoteleras",
+  "main": "index.js",
+  "scripts": {
+    "test": "ini",
+    "start": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/casq89/sistent_chat.git"
+  },
+  "keywords": [
+    "chat",
+    "reservas",
+    "hoteleras",
+    "atencion",
+    "al",
+    "cliente"
+  ],
+  "author": "@camilos",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/casq89/sistent_chat/issues"
+  },
+  "homepage": "https://github.com/casq89/sistent_chat#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "bootstrap": "^4.4.1",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "express-handlebars": "^3.1.0",
+    "express-method-override": "0.0.3",
+    "firebase-admin": "^8.10.0",
+    "firebaseui": "^4.5.0",
+    "jade": "^1.11.0",
+    "morgan": "^1.9.1",
+    "serve-favicon": "^2.5.0",
+    "socket.io": "^2.3.0"
+  },
+  "devDependencies": {}
+}

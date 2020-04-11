@@ -1,0 +1,33 @@
+{{> create_ciudad_modal}}
+<div class="row justify-content-md-center">
+	<a href="#" data-toggle="modal" data-target="#modal" id="add" ><span class=" fa fa-plus-circle" data-toggle="tooltip" title="Nueva Ciudad"></span></a>
+</div>
+<div class="row justify-content-center align-items-center">
+	<div class="cards">
+	{{#if data}}
+		{{#each data}}
+			<a href="/detail_ciudad/{{id}}">
+				<div class="card bg-hotel ml-4 mt-4">
+					<div class="card-header">
+						<div class="row">
+							<div class="col-12">
+								Nombre: {{nombre}}
+								<br>
+								Departamento: {{departamento}}
+							</div>
+						</div>
+					</div>
+			    	<div class="card-body text-center">
+			    		<img src="{{imagen}}" height="300">
+			    	</div>
+			  	</div>
+			  </a>
+		{{/each}}
+	{{else}}
+		<h2>
+			No hay Ciudades disponibles actualmente
+		</h2>
+	{{/if}}
+	</div>
+</div>
+

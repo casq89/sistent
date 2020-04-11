@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="/css/estilos.css">
+	<title>{{title}}</title>
+</head>
+<body>
+	<div class="modal-backdrop fade show" id="loader-modal" style="display: none;">
+    	<div class="reverse-spinner" id="loader"  style="display:none"></div>
+  	</div>
+	<div id="wrapper">
+		<div id="content-wrapper" class="d-flex flex-column">
+			<div id="content">
+				{{#if landing}}
+
+				{{else}}
+					<header style="height: 65px;" id="header">
+						<div class="row">
+							<div class="col-4">
+								<a href="/index"><img class="ml-5 mt-1 mb-1" src="/images/logo.png" height="60" data-toggle="tooltip" title="Ir a Inicio"></a>
+							</div>
+							<div class="col-6 text-center text-white"><h2>{{title_window}}</h2></div>
+							<div class="col-2 text-white pt-3">Usuario: <span id="usuario-sigin"></span><a href="#" onclick="logout(event)"><span class="fas fa-sign-out-alt logout ml-4" data-toggle="tooltip" title="Salir"></span></a></div>
+						</div>
+					</header>
+				{{/if}}
+				<main id="main">
+						{{#if landing}}
+						{{else}}
+							{{> menu}}
+						{{/if}}
+					<aside>
+						{{{body}}}
+					</aside>
+				</main>
+			</div>
+		</div>
+	</div>
+	{{> scripts}}
+</body>
+</html>
+

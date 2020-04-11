@@ -1,0 +1,102 @@
+<div class="menu-logo-container">
+	<div class="container">
+		<div class="navbar navbar-default">
+			<a href="/login" class="logo">
+				<div class="row logo" data-toggle="tooltip" title="Ir Software Sistent">
+					<div class="col-4">
+							<img class="ml-5 mt-1 mb-1" src="/images/logo.png" height="60"/>
+					</div>
+					<div class="col-8"></div>
+				</div>
+			</a>
+			<a href="/" class="text-white">Inicio</a>
+			<a href="/" class="text-white">Quienes Somos</a>
+			<a href="/" class="text-white">Galería</a>
+			<a href="/login" class="text-white">usuarios</a>
+		</div>
+	</div>
+</div>
+<div id="slider">
+	<figure>
+		<img src="/images/slider1.jpg" alt>
+		<img src="/images/slider2.jpg" alt>
+		<img src="/images/slider3.jpg" alt>
+		<img src="/images/slider4.jpg" alt>
+		<img src="/images/slider5.jpg" alt>
+	</figure>
+</div>
+<div id="slider2">
+	<figure>
+		<div id="slider5" class="text-center pt-3"><h2>Nuestas Ciudades Disponibles</h2></div>
+		<div id="slider6" class="text-center pt-3"><h2>Realiza ya tu reserva en nuestro Chat</h2></div>
+	</figure>
+</div>
+<a href="" id="icono-chat" onclick="toogleChat(event)">
+	<div >
+		<img src="/images/favicon.png" width="60" data-toggle="tooltip" title="Chatbot">
+	</div>
+</a>
+<div class="load" id="load">
+    <div class="lds-ripple">
+        <div></div>
+        <div></div>
+    </div>
+</div>
+<div class="row justify-content-center align-items-center ml-4" id="cities">
+	<div class="col-8">
+		<div class="cards">
+		{{#if data}}
+			{{#each data}}
+				<a href="">
+					<div class="card bg-ciudad ml-4 mt-4">
+						<div class="card-header">
+							<div class="row">
+								<div class="col-12 text-center">
+									<h4>{{nombre}}</h4>
+								</div>
+							</div>
+						</div>
+				    	<div class="card-body text-center">
+				    		<img src="{{imagen}}" height="300">
+				    	</div>
+				  	</div>
+				  </a>
+			{{/each}}
+		{{else}}
+			<h2>
+				No hay Ciudades disponibles actualmente
+			</h2>
+		{{/if}}
+		</div>
+	</div>
+</div>
+<div class="chat" id="chat">
+	<div class="chat-header" id="chat-header" onclick="toogleChat(event)">
+		<div class="row">
+			<div class="col-4">
+				<img src="/images/favicon.png" alt="" class="logo-chat" data-toggle="tooltip" title="Abrir/minimizar chat" onclick="toogleChat(event)" >
+			</div>
+			<div class="col-4">Chatbot Sistent</div>
+			<div class="col-3 "><span class="fa fa-minus cerrar-chat" data-toggle="tooltip" title="Abrir/minimizar chat" onclick="toogleChat(event)" ></span></div>
+		</div>
+	</div>
+	<div class="chat-body" id="chat-body">
+		<div class="chat-vacio"></div>
+	</div>
+	<div class="chat-footer mb-4" id="chat-footer">
+		<div class="typing" id="typing">
+			<div class="mensaje-in-logo mr-2 text-white" ><img src="/images/favicon.png" width="40" data-toggle="tooltip" title="Sisten chat" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;escribiendo....</div>
+		</div>
+		<div class="row" style="margin: 0 !important;padding:0 !important;">
+			<div class="col-10">
+				<form id="send">
+					<input type="text" id="texto" placeholder="Escribir un mensaje..." autofocus="true">
+				</form>
+			</div>
+			<div class="col-2">
+				<img src="/images/send.png" class="logo-enviar" data-toggle="tooltip" title="Preciona 'Enter' para enviar" onclick="setMessage(event)">
+			</div>
+		</div>
+	</div>
+</div>
+<footer></footer>

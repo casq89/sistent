@@ -1,0 +1,114 @@
+<div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+	<div class="modal-dialog" role="document" id="modal_hotel" >
+		<div class="modal-content">
+			<div class="modal-header bg-dark-h">
+				<h5 class="modal-title" id="modalLabel">Editar Hotel</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close" id="close_modal">
+				<span aria-hidden="true" class="bg-dark-h">&times;</span>
+				</button>
+			</div>
+			<div class="row mt-3">
+				<div class="col-6" id="hotel">
+					<form  method="POST" action="{{path_form}}" id="detail_hotel" >
+						<div class="row justify-content-center align-items-center">
+							<div class="form-group col-5">
+							    <label for="nombre">Nombre</label>
+							    <input type="hidden" name="id" id="id">
+							    <input type="text" class="form-control" id="nombre" name ="nombre" placeholder="nombre">
+						  	</div>
+						  	<div class="form-group col-5">
+							    <label for="ciudad">Ciudad</label>
+							    <select class="form-control" id="ciudad" name="ciudad">
+									<option value="">Seleccione..</option>
+							    	{{#if listCiudades}}
+							    		{{#each listCiudades}}
+											<option value="{{clave}}">{{valor}}</option>
+										{{/each}}
+							    		}
+									{{/if}}
+								</select>
+						  	</div>
+						  	<div class="form-group col-5">
+							    <label for="imagen">Imagen</label>
+							    <textarea class="form-control" id="imagen" name ="imagen" placeholder="imagen"></textarea>
+						  	</div>
+						  	<div class="form-group col-5">
+							    <label for="site">Web Site</label>
+							    <input type="text" class="form-control" id="site" name ="site" placeholder="web site">
+						  	</div>
+						  	<div class="form-group col-10">
+							    <label for="estado">Estado</label>
+							    <select class="form-control" id="estado" name="estado">
+									<option value="">Seleccione..</option>
+									<option value="1">Activo</option>
+									<option value="0">Inactivo</option>
+								</select>
+						  	</div>
+						  	<div class="form-group col-10 center">
+						  		<center>
+						  			<a class="btn bg-dark-h" href="#" data-dismiss="modal">Cerrar</a>
+						  			<button class="btn bg-dark-h" onclick="validarHotel(event)">Actualizar</button>
+						  		</center>
+						  	</div>
+					  	</div>
+					</form>
+				</div>
+				<div class="col-6 nueva_habitacion">
+					<form  method="POST" action="#" id="habitacion_nueva" >
+						<div class="row justify-content-center align-items-center">
+							<div class="col-10 center bg-dark-h mb-1 habitacion">
+							Habitacion Nueva
+							</div>
+							<div class="col-3">
+								<center>
+									<img src="" id="img_nueva" width="70">
+								</center>
+							</div>
+							<div class="col-7 form-group">
+								<label for="imagen_habitacion_nueva">Imagen</label>
+								<textarea rows="3" onfocusout="focusImagen(event, 1, 'nueva')" class="form-control form-control-textarea" id="imagen_habitacion_nueva" name ="imagen_habitacion_nueva" placeholder="imagen habitación" ></textarea>
+							</div>
+
+							<div class="col-3">
+								<label for="numero_habitacion_nueva">Nº habitación</label>
+								<input type="text" class="form-control" id="numero_habitacion_nueva" name ="numero_habitacion_nueva" placeholder="numero habitacion" >
+							</div>
+							<div class="col-3">
+								<label for="capacidad_nueva">Capacidad</label>
+								<input type="text" class="form-control" id="capacidad_nueva" name ="capacidad_nueva" placeholder="capacidad"  onkeypress="return valida(event)" maxlength="2">
+							</div>
+							<div class="col-4">
+								<label for="tipo_nueva">Tipo</label>
+								<select class="form-control" id="tipo_nueva" name="tipo_nueva">
+									<option value="">Seleccione..</option>
+									<option value="a">A</option>
+									<option value="b">B</option>
+									<option value="c">C</option>
+								</select>
+							</div>
+						
+							<div class="col-6">
+								<label for="precio_nueva">Precio</label>
+								<input type="text" class="form-control" id="precio_nueva" name ="precio_nueva" placeholder="precio" onkeypress="return valida(event)" maxlength="8">
+							</div>
+							<div class="col-4">
+								<label for="estado_nueva">Estado</label>
+								<select class="form-control" id="estado_nueva" name="estado_nueva">
+									<option value="">Seleccione..</option>
+									<option value="1">Activo</option>
+									<option value="0">Inactivo</option>
+								</select>
+							</div>
+							<div class="form-group col-10 center mt-3">
+						  		<center>
+						  			<button class="btn bg-dark-h" onclick="saveHabitacion(1, event)">Añadir Habitación</button>
+						  		</center>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+			<div class="row mt-3 mb-3" id="habitaciones"></div>
+		</div>
+	</div>
+</div>

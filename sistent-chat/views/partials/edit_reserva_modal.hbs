@@ -1,0 +1,116 @@
+<div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+	<div class="modal-dialog" role="document" >
+		<div class="modal-content">
+			<div class="modal-header bg-dark-h">
+				<h5 class="modal-title" id="modalLabel">Editar Reserva</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close" id="close_modal">
+				<span aria-hidden="true" class="bg-dark-h">&times;</span>
+				</button>
+			</div>
+			<div class="row justify-content-center align-items-center">
+				<form  method="POST" action="{{path_form}}" id="detail_ciudad" >
+					<div class="row justify-content-center align-items-center">
+						<div class="form-group col-5">
+						    <label for="cedula">Cédula</label>
+						    <input type="hidden" name="id" id="id">
+						    <input type="text" class="form-control" id="cedula" name ="cedula" placeholder="cedula">
+					  	</div>
+					  	<div class="form-group col-5">
+						    <label for="nombre_completo">Nombre completo</label>
+						    <input type="text" class="form-control" id="nombre_completo" name ="nombre_completo" placeholder="nombre completo">
+					  	</div>
+					  	<div class="form-group col-5">
+						    <label for="telefono">Teléfono</label>
+						    <input type="text" class="form-control" id="telefono" name ="telefono" placeholder="telefono">
+					  	</div>
+					  	<div class="form-group col-5">
+						    <label for="ciudad">Ciudad</label>
+						    <select class="form-control" id="ciudad" name="ciudad" onchange="setSelectHoteles(event)">
+								<option value="">Seleccione..</option>
+						    	{{#if listCiudades}}
+						    		{{#each listCiudades}}
+										<option value="{{clave}}">{{valor}}</option>
+									{{/each}}
+						    		}
+								{{/if}}
+							</select>
+					  	</div>
+					  	<div class="form-group col-5">
+						    <label for="hotel">Hotel</label>
+						    <select class="form-control" id="hotel" name ="hotel" value="{{hotel}}">
+						    </select>
+					  	</div>
+					  	<div class="form-group col-5">
+						    <label for="habitacion">Nº Habitación</label>
+						    <input type="text" class="form-control" id="habitacion" name ="habitacion" placeholder="número habitación">
+					  	</div>
+					  	<div class="form-group col-5">
+						    <label for="numero_personas">Nº Personas</label>
+						    <input type="number" class="form-control" id="numero_personas" name ="numero_personas" placeholder="número personas">
+					  	</div>
+					  	<div class="form-group col-5">
+						    <label for="fecha_ingreso">Fecha Ingreso</label>
+						    <input type="text" class="form-control" id="fecha_ingreso" name ="fecha_ingreso" placeholder="fecha ingreso">
+					  	</div>
+					  	<div class="form-group col-5">
+						    <label for="fecha_salida">Fecha Salida</label>
+						    <input type="text" class="form-control" id="fecha_salida" name ="fecha_salida" placeholder="fecha salida">
+					  	</div>
+					  	<div class="form-group col-5">
+						    <label for="estado">Estado</label>
+						    <select class="form-control" id="estado" name="estado">
+								<option value="">Seleccione..</option>
+								<option value="1">Activo - Pendiente CheckIn</option>
+								<option value="2">CheckIn</option>
+								<option value="3">CheckOut</option>
+								<option value="0">Inactivo</option>
+							</select>
+					  	</div>
+					  	<div class="form-group col-102 center">
+					  		<center>
+					  			<a class="btn bg-dark-h" href="#" data-dismiss="modal">Cerrar</a>
+					  			<input type="reset" name="" value="Limpiar" class="btn btn-dark-h">
+					  			<button class="btn bg-dark-h" onclick="validarReserva(event)">Guardar</button>
+					  		</center>
+					  	</div>
+				  	</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+const option = "{{data.estado}}"
+
+selecedOption(option,document)
+
+function selecedOption(option,d)
+{
+
+var select = d.getElementById("estado")
+
+    for (var i = 0; i < select.options.length; i++) 
+    {
+        if(select.options[i].value == option)
+        {
+        	d.getElementById("estado").options[i].selected = true
+        }
+    }
+}
+
+</script>
+{{#if flag}}
+	<script src="/js/toast.js"></script>
+	<script>
+	    var toast = new iqwerty.toast.Toast();
+	    toast
+	    .setText("{{msg}}")
+	    .setDuration(3000)
+	    .stylize({
+	        background: '#78C363',
+	        color: 'white',
+	        'box-shadow': '0 0 50px rgba(0, 0, 0, .7)'
+	    })
+	    .show();
+	</script>
+{{/if}}

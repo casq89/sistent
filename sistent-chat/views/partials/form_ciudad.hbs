@@ -1,0 +1,65 @@
+<form  method="POST" action="{{path_form}}" id="detail_ciudad">
+	<div class="form-group">
+	    <label for="nombre">Nombre</label>
+	    <input type="hidden" name="id" value="{{data.id}}">
+	    <input required="true" type="text" class="form-control" id="nombre" name ="nombre" placeholder="nombre" value="{{data.nombre}}">
+  	</div>
+  	<div class="form-group">
+	    <label for="departamento">Departamento</label>
+	    <input required="true" type="text" class="form-control" id="departamento" name ="departamento" placeholder="departamento" value="{{data.departamento}}">
+  	</div>
+  	<div class="form-group">
+	    <label for="estado">Estado</label>
+	    <select class="form-control" id="estado" name="estado" required="true">
+			<option value="">Seleccione..</option>
+			<option value="1">Activo</option>
+			<option value="2">Inactivo</option>º
+		</select>
+  	</div>
+  	<div class="form-group">
+	    <label for="imagen">Imagen</label>
+	    <input required="true" type="text" class="form-control" id="imagen" name ="imagen" placeholder="imagen" value="{{data.imagen}}">
+  	</div>
+  	<div class="form-group center">
+  		<center>
+  			<a class="btn bg-dark-h" href="/ciudades">Volver</a>
+  			<input type="reset" name="" value="Limpiar" class="btn">
+  			<button class="btn bg-dark-h" onclick="validarCiudad(event)">Guardar</button>
+  		</center>
+  	</div>
+</form>
+<script>
+const option = "{{data.estado}}"
+
+selecedOption(option,document)
+
+function selecedOption(option,d)
+{
+
+var select = d.getElementById("estado")
+
+    for (var i = 0; i < select.options.length; i++) 
+    {
+        if(select.options[i].value == option)
+        {
+        	d.getElementById("estado").options[i].selected = true
+        }
+    }
+}
+
+</script>
+{{#if flag}}
+	<script src="/js/toast.js"></script>
+	<script>
+	    var toast = new iqwerty.toast.Toast();
+	    toast
+	    .setText("{{msg}}")
+	    .setDuration(3000)
+	    .stylize({
+	        background: '#78C363',
+	        color: 'white',
+	        'box-shadow': '0 0 50px rgba(0, 0, 0, .7)'
+	    })
+	    .show();
+	</script>
+{{/if}}
