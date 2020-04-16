@@ -5,7 +5,6 @@ firebase login
 //inicializar functions de firestore
 firebase init functions
 //instalar librerias necesarias
-npm  install actions-on-google dialogflow-fulfillment --save
 //Despliegue
 firebase deploy --only functions
 firebase deploy --only functions:dialogflowFirebaseFulfillment

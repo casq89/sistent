@@ -5,6 +5,7 @@ const {WebhookClient, Card, Suggestion} = require('dialogflow-fulfillment')
 const { SessionsClient } = require('dialogflow')
 const cors = require('cors')({ origin: true})
 const serviceAccount = require('./service-account.json')
+const means = require('./means.js')
 
 process.env.DEBUG = 'dialogflow:*'
 admin.initializeApp(functions.config().firebase)
@@ -24,14 +25,23 @@ exports.dialogflowGateway = functions.https.onRequest((request, response) => {
 
 exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, response) => {
 	const agent = new WebhookClient({ request, response })
+	const action = request.body.queryResult.action
+	// console.log('Dialogflow Request headers: ' + JSON.stringify(request.headers));
+  	// console.log('Dialogflow Request body: ' + JSON.stringify(request.body));
 	function solicitud_reserva(agent)
 	{
-		let respuesta = [
-			'Por supuesto estas son las ciudades que tenemos disponibles', 
-			'Ok, ya mismo, esta es la lista de las ciudades en las que estamos presentes:',
-			'Por supuesto, tenemos nuestros hoteles en las siguientes ciudades:'
-		]
-		agent.add(respuesta[getRandom(respuesta.length)])
+		let respuesta
+		var m = new means()
+		if(String(action) === 'solicitud_reserva_1')
+		{
+			respuesta = m.solicitud_reserva(1)
+		}
+		else if(String(action) === 'solicitud_reserva_2')
+		{
+			respuesta = m.solicitud_reserva(2)
+		}
+
+		agent.add(respuesta.respuesta_1[getRandom(respuesta.respuesta_1.length)])
     	const dialogflowAgentDoc = db.collection('ciudad').where('estado','==','1');
     	return dialogflowAgentDoc.get()
       		.then(querySnapshot => {
@@ -47,7 +57,7 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
 					    }))
                 })
         		
-        		agent.add(`Por favor dime a ¿que ciudad quieres ir?`);
+        		agent.add(`${respuesta.respuesta_2}`);
 
                 return Promise.resolve('Lectura Completa');
             })
@@ -58,9 +68,26 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
 
 	function solicitud_reserva_1(agent)
 	{
-		var context = agent.context.get('solicitud-reserva-followup-2')
+		let respuesta
+		let last_context
+		let contexto
+		var m = new means()
 		let ciudad = normalize(agent.parameters.ciudad).toLowerCase()
 
+		if(String(action) === 'solicitud-reserva.solicitud-reserva-custom')
+		{
+			respuesta = m.solicitud_reserva_1(1)
+			contexto = 1
+			last_context = 'solicitud-reserva-followup-2'
+		}
+		else if(String(action) === 'solicitud-reserva-2.solicitud-reserva-2-custom')
+		{
+			respuesta = m.solicitud_reserva_1(2)
+			contexto = 2
+			last_context = 'solicitud-reserva-2-followup'
+		}
+
+		var context = agent.context.get(last_context)
 		const hoteles = db.collection('hotel').where('ciudad', '==', ciudad);
 
     	return hoteles.get()
@@ -71,7 +98,7 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
 
                 if(orders.length > 0)
                 {
-                	agent.add(`Perfecto! en la bella ciudad de ${agent.parameters.ciudad} tenemos los siguientes hoteles:`);
+                	agent.add(`${respuesta[0]} ${agent.parameters.ciudad} tenemos los siguientes hoteles:`);
 	                orders.forEach((eachOrder, index) => {
 
                         agent.add(new Card({
@@ -81,7 +108,7 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
 					      	buttonUrl:eachOrder.site
 					    }))
 	                })
-	                agent.add(`¿Cuál deseas elegir?`);
+	                agent.add(`${respuesta[1]}`);
 	                orders.forEach((eachOrder, index) => {
 
 	                	agent.add(new Suggestion(eachOrder.nombre));
@@ -91,13 +118,14 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
             			'name': 'solicitud-reserva-custom-followup', 
             			'lifespan' : 5, 
             			'parameters' : {
-                			'ciudad': context.parameters.ciudad
+							'ciudad': context.parameters.ciudad,
+							'contexto':contexto
 	                	} 
                 	})
                 }
                 else
                 {
-        			agent.add(`Actualmente en la ciudad de ${agent.parameters.ciudad} no tenemos hoteles disponibles por favor elige uno de los hoteles que te sugerimos`);
+        			agent.add(`${respuesta[2]} ${agent.parameters.ciudad} ${respuesta[3]}`);
                 }
         	
                 return Promise.resolve('Lectura Completa');
@@ -110,7 +138,19 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
 	function solicitud_reserva_2(agent)
 	{
 		var context = agent.context.get('solicitud-reserva-custom-followup')
+		let contexto = context.parameters.contexto
 		let hotel = agent.parameters.hotel
+		let respuesta
+		var m = new means()
+
+		if(contexto === 1)
+		{
+			respuesta = m.solicitud_reserva_2(1)
+		}
+		else if(contexto === 2)
+		{
+			respuesta = m.solicitud_reserva_2(2)
+		}
 		const hab = db.collection('hotel').where('nombre', '==', hotel);
 		return hab.get()
 			.then(querySnapshot =>{
@@ -125,7 +165,7 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
 
                 		if(habitaciones.length)
                 		{
-                			agent.add(`Ok tenemos las siguiente habitaciones: `);
+                			agent.add(`${respuesta[0]}`);
 	                		for(habitacion in habitaciones)
 	                		{
 		                		agent.add(new Card({
@@ -135,7 +175,7 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
 							      	buttonUrl:'#'
 							    }))
 	                		}
-	                		agent.add(`Si estas interesado por favor elige una`);
+	                		agent.add(`${respuesta[1]}`);
 	                		for(habitacion in habitaciones)
 	                		{  
 	                			agent.add(new Suggestion(habitaciones[habitacion].nombre));
@@ -145,19 +185,20 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
 	                			'lifespan' : 5, 
 	                			'parameters' : {
 		                			'hotel': hotel, 
-		                			'ciudad': context.parameters.ciudad
+									'ciudad': context.parameters.ciudad,
+									'contexto': contexto
 			                	} 
 		                	})
                 		}
                 		else
                 		{
-                			agent.add(`Lo sentimos no hay habitaciones habilitadas en  ${hotel}`);
+                			agent.add(`${respuesta[2]}  ${hotel}`);
                 		}
                 	})
                 }
                 else
                 {
-        			agent.add(`Lo sentimos No encontramos habitaciones`);
+        			agent.add(`${respuesta[3]}`);
                 }
                 return Promise.resolve('Lectura Completa');
 			})
@@ -169,14 +210,28 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
 	function solicitud_reserva_3(agent)
 	{
 		var context = agent.context.get('solicitud-reserva-custom-custom-followup')
-		agent.add(`Ok por favor dime la fecha de ingreso y la fecha de salida para realizar la validación`)
+		let contexto = context.parameters.contexto
+		let respuesta
+		var m = new means()
+
+		if(contexto === 1)
+		{
+			respuesta = m.solicitud_reserva_3(1)
+		}
+		else if(contexto === 2)
+		{
+			respuesta = m.solicitud_reserva_3(2)
+		}
+
+		agent.add(`${respuesta[0]}`)
 		agent.context.set({
 			'name': 'fecha_reserva', 
 			'lifespan' : 5, 
 			'parameters' : {
 				'numero_habitacion': agent.parameters.numero_habitacion, 
 				'hotel': context.parameters.hotel,
-				'ciudad': context.parameters.ciudad
+				'ciudad': context.parameters.ciudad,
+				'contexto': contexto
 			} 
 		})
 	}
@@ -185,16 +240,32 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
 	{
 		var context = agent.context.get('fecha_reserva')
 		var fechas = formatDateChat(agent.parameters.fecha)
+		let contexto = context.parameters.contexto
+		let respuesta
+		let next_context
+		var m = new means()
+
+		if(contexto === 1)
+		{
+			respuesta = m.fechas(1)
+			next_context = 'fechas-followup'
+		}
+		else if(contexto === 2)
+		{
+			respuesta = m.fechas(2)
+			next_context = 'fechas-followup-2'
+		}
+
 		if(fechas.length === 2)
 		{
-			agent.add(`Perfecto entonces le confirmo:`)
+			agent.add(`${respuesta[0]}`)
 			agent.add(`Fecha ingreso: ${fechas[0].substr(0,10)}`)
 			agent.add(`Fecha salida: ${fechas[1].substr(0,10)}`)
 			agent.add(`Habitación: ${context.parameters.numero_habitacion}`)
 			agent.add(`Hotel: ${context.parameters.hotel}`)
 			agent.add(`Ciudad: ${capitalizeFirstLetter(context.parameters.ciudad)}`)
-			agent.add(``)
-			agent.add(`Ahora necesito que por favor me proporcione los siguientes datos:`)
+
+			agent.add(`${respuesta[1]}`)
 			agent.add(`Nombre completo:`)
 			agent.add(`Cédula:`)
 			agent.add(`Correo eléctronico:`)
@@ -216,7 +287,7 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
 		}
 		else
 		{
-			agent.add(`Me podrías repetir el rango de fechas en un formato más entendible para mi, por ejemplo "del 24 de Diciembre al 28 de Diciembre de 2020"`)
+			agent.add(`${respuesta[2]}`)
 		}
 	}
 
@@ -226,20 +297,20 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
 
 		const reserva = db.collection('reserva').add({
 			nombre_completo:agent.parameters.person.name,
-			cedula: agent.parameters.numero_cedula[0],
-			telefono: agent.parameters.phone[0],
+			cedula: String(agent.parameters.numero_cedula[0]),
+			telefono: String(agent.parameters.phone[0]),
 			ciudad:context.parameters.ciudad,
 			hotel: context.parameters.hotel,
 			email: context.parameters.email,
-			habitacion:context.parameters.numero_habitacion,
-			numero_personas:agent.parameters.numero_personas[0],
+			habitacion: String(context.parameters.numero_habitacion),
+			numero_personas: String(agent.parameters.numero_personas[0]),
 			fecha_ingreso:context.parameters.fecha_ingreso,
 			fecha_salida:context.parameters.fecha_salida,
-			estado:1
+			estado:'1'
 		});
     	return reserva.then(doc => {
 
-		agent.add(`Perfecto! señor ${agent.parameters.person.name} su reserva ha sido realizada exitosamente`)
+		agent.add(`Perfecto! señor(a) ${agent.parameters.person.name} su reserva ha sido realizada exitosamente`)
 		agent.add(`Le confirmo los datos de su reserva: `)
 		agent.add(`Nombre completo: ${agent.parameters.person.name}`)
 		agent.add(`Cédula: ${agent.parameters.numero_cedula}`)
@@ -261,25 +332,57 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
 
 	function servicios(agent)
 	{
-		agent.add(`Ok, recuerde que  le puedo ayudar con lo siguiente:`)
-		agent.add(new Suggestion(`Realizar reserva`));
-		agent.add(new Suggestion(`Consultar reserva`));
-		agent.add(new Suggestion('Cancelar reserva'));
+		let respuesta
+		var m = new means()
+
+		switch(String(action))
+		{
+			case 'cancelar-reserva.cancelar-reserva-yes.cancelar-reserva-yes-custom.cancelar-reserva-yes-custom-no':
+			case 'cancelar-reserva.cancelar-reserva-yes.cancelar-reserva-yes-custom.cancelar-reserva-yes-custom-yes.cancelar-reserva-yes-custom-yes-yes': 
+			case 'consultar-reserva.consultar-reserva-custom.consultar-reserva-custom-yes':
+			case 'fechas.fechas-custom.datosreserva-yes':
+			respuesta = m.ofrecer_servicios(1)	
+			break;
+			case 'cancelar-reserva-2.cancelar-reserva-2-yes.cancelar-reserva-2-yes-custom.cancelar-reserva-2-yes-custom-no':
+			case 'cancelar-reserva-2.cancelar-reserva-2-yes.cancelar-reserva-2-yes-custom.cancelar-reserva-2-yes-custom-yes.cancelar-reserva-2-yes-custom-yes-yes':
+			case 'consultar-reserva-2.consultar-reserva-2-custom.consultar-reserva-2-custom-yes':
+			case 'fechas.fechas-custom.datosreserva-2-yes':
+			respuesta = m.ofrecer_servicios(2)	
+			break;
+			default:
+			respuesta = m.ofrecer_servicios(1)
+			break;
+		}
+		agent.add(`${respuesta[0]}`)
+		agent.add(new Suggestion(`Realizar una reserva`));
+		agent.add(new Suggestion(`Consultar una reserva`));
+		agent.add(new Suggestion('Cancelar una reserva'));
 	}
 
 	function consultar_reserva(agent)
 	{
-		let cedula = agent.parameters.cedula
-		const reservas = db.collection('reserva').where('cedula','==',cedula).where('estado', '==', 1)
+		let cedula = String(agent.parameters.cedula)
+		let respuesta
+		let contexto
+		var m = new means()
+		if(action === 'consultar-reserva.consultar-reserva-custom')
+		{
+			respuesta = m.consultar_reserva_info(1)
+		}
+		else
+		{
+			respuesta = m.consultar_reserva_info(2)
+		}
+		const reservas = db.collection('reserva').where('cedula','==',cedula).where('estado', '==', '1')
 
     	return reservas.get()
   		.then(querySnapshot => {
    			var orders = [];
             querySnapshot.forEach((doc) => { orders.push(doc.data()) });
 
-            if(orders.length >0)
+            if(orders.length > 0)
             {
-            	agent.add(`Efectivamente tiene una reserva`)
+            	agent.add(`${respuesta[0]}`)
 	            orders.forEach((eachOrder, index) => {
 	            	agent.add(`Nombre: ${eachOrder.nombre_completo}`)
 	            	agent.add(`Cédula: ${eachOrder.cedula}`)
@@ -290,13 +393,13 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
 	            	agent.add(`Para ${eachOrder.numero_personas} personas`)
 	            	agent.add(`Fecha ingreso: ${eachOrder.fecha_ingreso.substr(0,10)}`)
 	            	agent.add(`Fecha salida: ${eachOrder.fecha_salida.substr(0,10)}`)
-	            	agent.add(`¿Le puedo ayudar en algo más?`)
+	            	agent.add(`${respuesta[1]}`)
 	            })
             }
             else
             {
-            	agent.add(`Lo siento pero no me registran reservas activas con el número de cédula: ${cedula}`)
-            	agent.add(`Puedes volver a intentarlo´si verificas que hubo un error de digitación`)
+            	agent.add(`${respuesta[2]} ${cedula}`)
+            	agent.add(`${respuesta[3]}`)
             }
 
             return Promise.resolve('Lectura Completa');
@@ -309,8 +412,21 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
 
 	function consultar_reserva_cancelar(agent)
 	{
-		let cedula = agent.parameters.cedula
-		const reservas = db.collection('reserva').where('cedula','==',cedula).where('estado', '==', 1)
+		let cedula = String(agent.parameters.cedula)
+		let respuesta
+		let contexto
+		var m = new means()
+		if(action === 'cancelar-reserva.cancelar-reserva-yes.cancelar-reserva-yes-custom')
+		{
+			respuesta = m.cancelar_reserva_info(1)
+			contexto = 1
+		}
+		else
+		{
+			respuesta = m.cancelar_reserva_info(2)
+			contexto = 2
+		}
+		const reservas = db.collection('reserva').where('cedula','==',cedula).where('estado', '==', '1')
 
     	return reservas.get()
   		.then(querySnapshot => {
@@ -322,7 +438,7 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
             });
             if(orders.length >0)
             {
-            	agent.add(`Efectivamente tiene una reserva`)
+            	agent.add(`${respuesta[0]}`)
 	            orders.forEach((eachOrder, index) => {
 	            	agent.add(`Nombre: ${eachOrder.nombre_completo}`)
 	            	agent.add(`Cédula: ${eachOrder.cedula}`)
@@ -333,21 +449,22 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
 	            	agent.add(`Para ${eachOrder.numero_personas} personas`)
 	            	agent.add(`Fecha ingreso: ${eachOrder.fecha_ingreso.substr(0,10)}`)
 	            	agent.add(`Fecha salida: ${eachOrder.fecha_salida.substr(0,10)}`)
-	            	agent.add(`¿Estas seguro que deseas cancelar esta reserva?`)
+	            	agent.add(`${respuesta[1]}`)
 	            })
 
 	            agent.context.set({
 					'name': 'cancelar-reserva-yes-custom-followup', 
 					'lifespan' : 2, 
 					'parameters' : {
-						'id': id
+						'id': id,
+						'contexto': contexto
 					} 
 				})
             }
             else
             {
-            	agent.add(`Lo siento pero no me registran reservas activas con el número de cédula: ${cedula}`)
-            	agent.add(`Puedes volver a intentarlo´si verificas que hubo un error de digitación`)
+            	agent.add(`${respuesta[2]} ${cedula}`)
+            	agent.add(`${respuesta[3]}`)
             }
 
             return Promise.resolve('Lectura Completa');
@@ -360,13 +477,24 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
 	function cancelar_reserva(agent)
 	{
 		var context = agent.context.get('cancelar-reserva-yes-custom-followup')
+		let contexto = context.parameters.contexto
+		let respuesta
+		var m = new means()
+		if(contexto === 1)
+		{
+			respuesta = m.cancelar_reserva(contexto)
+		}
+		else if(contexto === 2)
+		{
+			respuesta = m.cancelar_reserva(contexto)
+		}
 		const estado = db.collection('reserva').doc(context.parameters.id);
     	return estado.update({
-    		estado:0
+    		estado:'0'
     	})
 		.then(doc => {
-      		agent.add(`Ok, su reserva ha sido cancelada exitosamente`);
-      		agent.add(`¿Le puedo ayudar en algo más?`);
+      		agent.add(`${respuesta[0]}`);
+      		agent.add(`${respuesta[1]}`);
       		return Promise.resolve('Read complete');
     	}).catch((error) => {
       		agent.add('Error:' + error);
@@ -427,18 +555,27 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
 	})();
 
 	let intentMap = new Map();
-  	intentMap.set('solicitud-reserva', solicitud_reserva);
-  	intentMap.set('solicitud-reserva - custom', solicitud_reserva_1);
+	intentMap.set('solicitud-reserva-1', solicitud_reserva);
+	intentMap.set('solicitud-reserva-2', solicitud_reserva);
+	intentMap.set('solicitud-reserva-1 - custom', solicitud_reserva_1);
+	intentMap.set('solicitud-reserva-2 - custom', solicitud_reserva_1);
   	intentMap.set('solicitud-reserva - custom - custom', solicitud_reserva_2)
   	intentMap.set('solicitud-reserva - custom - custom - custom', solicitud_reserva_3)
   	intentMap.set('fechas', fechas)
-  	intentMap.set('datos reserva', datos_reserva)
-  	intentMap.set('datos reserva - yes', servicios)
-  	intentMap.set('consultar-reserva - custom - yes', servicios)
-  	intentMap.set('consultar-reserva - custom', consultar_reserva)
-  	intentMap.set('cancelar-reserva - yes - custom', consultar_reserva_cancelar)
-  	intentMap.set('cancelar-reserva - yes - custom - no', servicios)
-  	intentMap.set('cancelar-reserva - yes - custom - yes', cancelar_reserva)
-	intentMap.set('cancelar-reserva - yes - custom - yes - yes', servicios)
+	intentMap.set('datos reserva-1', datos_reserva)
+	intentMap.set('datos reserva-1 - yes', servicios)
+	intentMap.set('datos reserva-2 - yes', servicios)
+	intentMap.set('consultar-reserva-1 - custom - yes', servicios)
+	intentMap.set('consultar-reserva-2 - custom - yes', servicios)
+	intentMap.set('consultar-reserva-1 - custom', consultar_reserva)
+	intentMap.set('consultar-reserva-2 - custom', consultar_reserva)
+	intentMap.set('cancelar-reserva-1 - yes - custom', consultar_reserva_cancelar)
+	intentMap.set('cancelar-reserva-2 - yes - custom', consultar_reserva_cancelar)
+	intentMap.set('cancelar-reserva-1 - yes - custom - no', servicios)
+	intentMap.set('cancelar-reserva-2 - yes - custom - no', servicios)
+	intentMap.set('cancelar-reserva-1 - yes - custom - yes', cancelar_reserva)
+	intentMap.set('cancelar-reserva-2 - yes - custom - yes', cancelar_reserva)
+	intentMap.set('cancelar-reserva-1 - yes - custom - yes - yes', servicios)
+	intentMap.set('cancelar-reserva-2 - yes - custom - yes - yes', servicios)
   	agent.handleRequest(intentMap);
 })

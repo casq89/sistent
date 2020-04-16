@@ -129,7 +129,10 @@ function toogleChat(event)
 }
 
 let form =  document.getElementById('send')
-form.addEventListener('submit', setMessage)
+if(form)
+{
+    form.addEventListener('submit', setMessage)
+}
 
 function setMessage(event)
 {

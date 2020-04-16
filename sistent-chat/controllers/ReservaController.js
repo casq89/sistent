@@ -47,7 +47,7 @@ ReservaController.getAll = (req, res, next) =>{
 								estado = 'CheckOut';
 								break;
 							case '0':
-								estado = 'Inactivo';
+								estado = 'Cancelado';
 								break;
 							default:
 								estado ='No disponible'
