@@ -1,16 +1,24 @@
 'use sctrict'
 
 var CiudadModel = require('../models/CiudadModel.js')
+var colombia = require('../public/js/colombia.json')
 
 CiudadController =  () => {}
 
-CiudadController.getAll = (req, res, next) =>{
+CiudadController.getMunicipio = (req, res, next) =>{
 
+	let departamento = req.params.departamento
+	const found = colombia.find(element => element.departamento == departamento)
+	res.send(found.ciudades)
+}
+
+CiudadController.getAll = (req, res, next) =>{
 	var obj = new CiudadModel()
 	obj.getAll().then((data) =>{
 		// console.log(data)
 		let locals ={
 			data:data,
+			colombia:colombia,
 			path_form:'/crear_ciudad',
 			title:'Sistent chat',
 			title_window:'Ciudades',
@@ -43,6 +51,7 @@ CiudadController.detail = (req, res, next) =>{
 		// console.log(data)
 		let locals ={
 			data:data[0],
+			colombia:colombia,
 			path_form:'/editar_ciudad',
 			title:'Sistent chat',
 			title_window:'Ciudad '+ data[0].nombre,
@@ -69,6 +78,7 @@ CiudadController.edit = (req, res, next) =>{
 		
 		let locals ={
 			data:datos,
+			colombia:colombia,
 			title:'Sistent chat',
 			title_window:'Ciudad '+ data.nombre,
 			description:'Detalle Ciudad',

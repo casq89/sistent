@@ -23,6 +23,7 @@ router
 		}
 		res.render('index', locals)
 	})
+	.get('/get_municipio/:departamento', CiudadController.getMunicipio)
 	.get('/ciudades',CiudadController.getAll )
 	.get('/detail_ciudad/:ciudad_id',CiudadController.detail )
 	.post('/crear_ciudad',CiudadController.create )

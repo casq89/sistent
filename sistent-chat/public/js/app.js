@@ -203,17 +203,17 @@ function setResponse(queryResult)
 
 function setResponseText(objeto, inicio, fin)
 {
+    let html =  `<div class="mensaje">
+                    <div class="mensaje-in-logo mr-2">
+                        <img src="/images/favicon.png" width="40" data-toggle="tooltip" title="Sisten chat" />
+                    </div>
+                    <div class="mensaje-in">`
     for(i = inicio; i < fin ; i ++)
     {
-        html =`
-            <div class="mensaje">
-                <div class="mensaje-in-logo mr-2"><img src="/images/favicon.png" width="40" data-toggle="tooltip" title="Sisten chat" /></div>
-                <div class="mensaje-in">${objeto[i].text.text[0]}</div>
-                <div class="mensaje-fecha-in">${getHora()}</div>
-            </div>
-         `
-        append(html)
+        html +=  `${objeto[i].text.text[0]}<br>`
     }
+    html += `</div><div class="mensaje-fecha-in">${getHora()}</div></div>`
+    append(html)
 }
 
 

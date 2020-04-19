@@ -2,6 +2,56 @@ window.onload = function(){
 
 	var d = document	
 	eventoIcono(d)
+	changeDepartamento()
+
+	if(typeof(departamento) != "undefined")
+	{
+		getMunicipios(departamento).then((data) =>{
+
+			setSelect(data, 'nombre')
+
+		}).catch((error) =>{
+			console.log(error)
+		})
+
+		document.getElementById('departamento').value= departamento
+	}
+}
+
+function changeDepartamento()
+{
+	$("#departamento").change(function(){
+		
+		getMunicipios($(this).val()).then((data) =>{
+
+			setSelect(data, 'nombre')
+
+		}).catch((error) =>{
+			console.log(error)
+		})
+	})
+}
+
+function setSelect(data, id)
+{
+	let nombre = document.getElementById(id)
+	html = '<option value="">Seleccione..</option>'
+	for(key in data)
+	{
+		html += `<option value="${data[key]}" >${data[key]}</option>`
+	}
+	nombre.innerHTML = html
+	if(municipio)
+	{
+		nombre.value = municipio
+	}
+}
+
+async function getMunicipios(departamento)
+{
+	let response = await fetch(baseUrl + '/get_municipio/' + departamento, {method: "GET"});
+    let datos =  response.json()
+    return datos
 }
 
 function addHotel()

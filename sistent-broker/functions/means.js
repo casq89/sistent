@@ -13,7 +13,7 @@ class Means
 				'Por supuesto, tenemos nuestros hoteles en las siguientes ciudades:'
             ]
             
-            respuesta.respuesta_2 = 'Por favor digame a ¿que ciudad desea ir?'
+            respuesta.respuesta_2 = 'Por favor digame a que ciudad desea ir para mostrarle las habitaciones disponibles'
         }
         else if(tipo === 2)
         {
@@ -23,7 +23,7 @@ class Means
 				'Por supuesto amigo(a), tenemos nuestros hoteles en las siguientes ciudades:'
             ]
             
-            respuesta.respuesta_2 = 'Ahora cuentame, ¿a qué ciudad quieres ir?'
+            respuesta.respuesta_2 = 'Ahora cuentame, a qué ciudad quieres ir y acontinuación te enseñaré las habitaciones disponibles'
         }
 
         return respuesta
