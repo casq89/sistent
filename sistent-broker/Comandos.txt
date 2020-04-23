@@ -11,3 +11,20 @@ firebase deploy --only functions:dialogflowFirebaseFulfillment
 firestore
 function de firestore
 realtime database
+
+//inicializar hosting
+firebase init hosting 
+
+//inicializar functions en hosting
+firebase init functions 
+
+//entrar en functions e instalar express
+npm i express --save 
+
+//ejecutar el proyecto servidor local
+firebase serve --only functions,hosting 
+
+//desplegar
+firebase deploy 
+
+//asignarle cache a una ruta
